@@ -18,6 +18,8 @@ from loss.MultiClassMetrics import *
 from models.FinetuneVTmodels import MIL_VT_FineTune
 from utils import *
 
+from models.MIL_VT import *
+
 ####################################
 
 def main():

@@ -36,7 +36,7 @@ def main():
     max_epoch = 10
     save_fraq = 10
 
-    batch_size = 8
+    batch_size = 16
     img_size = 384
     initialLR = 2e-5
     n_classes = 5
@@ -225,9 +225,11 @@ def main():
     print('Performance on Test Set with last model')
     test(epoch, model, criterion, test_loader, tbWriter)
 
-    print('###################################################')
-    print('Performance on Test Set with best model')
-    test(epoch, best_model, criterion, test_loader, tbWriter)
+    if debugFlag == False and 'best_model' in locals():
+        print('Performance on Test Set with best model')
+        test(epoch, best_model, criterion, test_loader, tbWriter)
+    else:
+        print('Skipping test with best_model (not saved in debug mode)')
 
 
     tbWriter.close()

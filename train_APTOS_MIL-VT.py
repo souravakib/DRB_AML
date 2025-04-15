@@ -30,7 +30,7 @@ def main():
     save_model_path = r'data/APTOS/PytorchModel/'
     csvName = csv_path + 'trainLabels.csv'  
 
-    gpu_ids = [0, 1]
+    gpu_ids = [0]
     start_epoch = 0
     max_epoch = 30
     save_fraq = 10

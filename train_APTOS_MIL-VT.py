@@ -36,7 +36,7 @@ def main():
     max_epoch = 10
     save_fraq = 10
 
-    batch_size = 16
+    batch_size = 8
     img_size = 384
     initialLR = 2e-5
     n_classes = 5
@@ -164,11 +164,11 @@ def main():
     if balanceFlag == True:
         train_loader = DataLoader(dataset_train, batch_size,
                               sampler = sampler,
-                              num_workers=8,  drop_last=True, shuffle=False) #shuffle=False when using the balance sampler,
+                              num_workers=2,  drop_last=True, shuffle=False) #shuffle=False when using the balance sampler,
     else:
-        train_loader = DataLoader(dataset_train, batch_size, num_workers=8,  drop_last=True, shuffle=True) #shuffle=True,
-    valid_loader = DataLoader(dataset_valid, batch_size, num_workers=8, drop_last=False)
-    test_loader = DataLoader(dataset_test, batch_size, num_workers=8,  drop_last=False)
+        train_loader = DataLoader(dataset_train, batch_size, num_workers=2,  drop_last=True, shuffle=True) #shuffle=True,
+    valid_loader = DataLoader(dataset_valid, batch_size, num_workers=2, drop_last=False)
+    test_loader = DataLoader(dataset_test, batch_size, num_workers=2,  drop_last=False)
 
     #################################################
 

@@ -19,6 +19,7 @@ from models.FinetuneVTmodels import MIL_VT_FineTune
 from utils import *
 
 from models.MIL_VT import *
+from torchvision.transforms import InterpolationMode
 
 ####################################
 
@@ -139,7 +140,7 @@ def main():
         transforms.RandomCrop((img_size, img_size)),  #padding=10
         transforms.RandomHorizontalFlip(),
         torchvision.transforms.RandomVerticalFlip(),
-        transforms.RandomRotation(10, resample=PIL.Image.BILINEAR),
+        transforms.RandomRotation(10, interpolation=InterpolationMode.BILINEAR),
         transforms.ColorJitter(hue=.05, saturation=.05, brightness=.05),
         transforms.ToTensor(),
         transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),

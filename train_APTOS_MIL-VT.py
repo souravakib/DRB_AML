@@ -152,18 +152,28 @@ def main():
     #################################################
 
     from torchvision.transforms import RandAugment, InterpolationMode
-
+    import torchvision.transforms as transforms
+    
+    
     transform_train = transforms.Compose([
-        transforms.Resize((img_size+40, img_size+40)),
+        transforms.Resize((img_size + 40, img_size + 40)),
         transforms.RandomCrop((img_size, img_size)),
         transforms.RandomHorizontalFlip(),
         transforms.RandomVerticalFlip(),
         transforms.RandomRotation(10, interpolation=InterpolationMode.BILINEAR),
-        transforms.ColorJitter(hue=.05, saturation=.05, brightness=.05),
-        RandAugment(num_ops=2, magnitude=7),  # ✅ Add this here
+        transforms.ColorJitter(hue=0.05, saturation=0.05, brightness=0.05),
+        RandAugment(num_ops=2, magnitude=7),
         transforms.ToTensor(),
-        transforms.Normalize([0.5]*3, [0.5]*3),
+        transforms.Normalize([0.5] * 3, [0.5] * 3),
     ])
+    
+    
+    transform_test = transforms.Compose([
+        transforms.Resize((img_size, img_size)),
+        transforms.ToTensor(),
+        transforms.Normalize([0.5] * 3, [0.5] * 3),
+    ])
+
 
 
     dataset_train = dataset_Aptos(data_path, DF_train, transform = transform_train)

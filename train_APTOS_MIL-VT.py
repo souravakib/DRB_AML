@@ -25,10 +25,10 @@ from models.MIL_VT import *
 def main():
 
     """Basic Setting"""
-    data_path = r'data/APTOS/Image/'
-    csv_path = r'data/APTOS/CSV/'
+    data_path = '/content/datasets/sovitrath/diabetic-retinopathy-2015-data-colored-resized/versions/2/train/'
+    csv_path = '/content/datasets/sovitrath/diabetic-retinopathy-2015-data-colored-resized/versions/2/'
     save_model_path = r'data/APTOS/PytorchModel/'
-    csvName = csv_path + 'train.csv'  ##the csv file store the path of image and corresponding label
+    csvName = csv_path + 'trainLabels.csv'  
 
     gpu_ids = [0, 1]
     start_epoch = 0

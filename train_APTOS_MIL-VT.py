@@ -33,7 +33,7 @@ def main():
 
     gpu_ids = [0]
     start_epoch = 0
-    max_epoch = 10
+    max_epoch = 30
     save_fraq = 10
 
     batch_size = 16
@@ -42,7 +42,7 @@ def main():
     n_classes = 5
 
     balanceFlag = True  #balanceFlag is set to True to balance the sampling of different classes
-    debugFlag = True  #Debug flag is set to True to train on a small dataset
+    debugFlag = False  #Debug flag is set to True to train on a small dataset
 
     base_model = 'MIL_VT_small_patch16_'+str(img_size)  #nominate the MIL-VT model to be used
     MODEL_PATH_finetune = 'MIL_VT_weights/fundus_pretrained_VT_small_patch16_384_5Class.pth.tar'
@@ -92,7 +92,23 @@ def main():
             multiLayers.append({'params': layer.parameters()})
     optimizer = torch.optim.Adam(multiLayers, lr = initialLR, eps=1e-8, weight_decay=1e-5)
 
-    criterion = nn.CrossEntropyLoss().cuda()
+    from timm.scheduler import CosineLRScheduler
+
+    scheduler = CosineLRScheduler(
+        optimizer,
+        t_initial=max_epoch,
+        lr_min=1e-6,
+        warmup_lr_init=1e-6,
+        warmup_t=3,
+    )
+
+
+    from torch.nn import CrossEntropyLoss
+
+    # Adjust weights based on class distribution
+    weights = torch.tensor([1.0, 2.5, 2.0, 3.0, 3.0]).cuda()  # tweak these for your dataset
+    criterion = CrossEntropyLoss(weight=weights)
+
 
     if resumeFlag:
         print(" Loading checkpoint from epoch '%s'" % (
@@ -118,8 +134,8 @@ def main():
     indexes = np.arange(len(DF0))
     np.random.seed(0)
     np.random.shuffle(indexes)
-    trainNum = np.int(len(indexes)*0.7)
-    valNum = np.int(len(indexes)*0.8)
+    trainNum = int(len(indexes)*0.7)
+    valNum = int(len(indexes)*0.8)
     DF_train = DF0.loc[indexes[:trainNum]]
     DF_val = DF0.loc[indexes[trainNum:valNum]]
     DF_test = DF0.loc[indexes[valNum:]]
@@ -135,22 +151,20 @@ def main():
 
     #################################################
 
+    from torchvision.transforms import RandAugment, InterpolationMode
+
     transform_train = transforms.Compose([
         transforms.Resize((img_size+40, img_size+40)),
-        transforms.RandomCrop((img_size, img_size)),  #padding=10
+        transforms.RandomCrop((img_size, img_size)),
         transforms.RandomHorizontalFlip(),
-        torchvision.transforms.RandomVerticalFlip(),
+        transforms.RandomVerticalFlip(),
         transforms.RandomRotation(10, interpolation=InterpolationMode.BILINEAR),
         transforms.ColorJitter(hue=.05, saturation=.05, brightness=.05),
+        RandAugment(num_ops=2, magnitude=7),  # ✅ Add this here
         transforms.ToTensor(),
-        transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
+        transforms.Normalize([0.5]*3, [0.5]*3),
     ])
 
-    transform_test = transforms.Compose([
-        transforms.Resize((img_size, img_size)),
-        transforms.ToTensor(),
-        transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
-    ])
 
     dataset_train = dataset_Aptos(data_path, DF_train, transform = transform_train)
     dataset_valid = dataset_Aptos(data_path, DF_val, transform = transform_test)
@@ -216,6 +230,8 @@ def main():
             print('Checkpoint saved, ', saveCheckPointName)
 
 
+        scheduler.step(epoch)
+    
     elapsed = np.round(time.time() - start_time)
     elapsed = str(timedelta(seconds=elapsed))
     train_time = str(timedelta(seconds=train_time))

@@ -199,6 +199,7 @@ class MILVisionTransformer_Distil(VisionTransformer):
 @register_model
 def MIL_VT_small_patch16_384(pretrained=False, **kwargs):
     kwargs.pop('pretrained_cfg', None)
+    kwargs.pop('pretrained_cfg_overlay', None)
     
     model = MILVisionTransformer(
         img_size=384, patch_size=16, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4, qkv_bias=True,
@@ -214,6 +215,9 @@ def MIL_VT_small_patch16_384(pretrained=False, **kwargs):
 
 @register_model
 def MIL_VT_small_patch16_512(pretrained=False, **kwargs):
+    kwargs.pop('pretrained_cfg', None)
+    kwargs.pop('pretrained_cfg_overlay', None)
+    
     model = MILVisionTransformer(
         img_size=512, patch_size=16, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4, qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)

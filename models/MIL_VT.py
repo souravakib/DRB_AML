@@ -201,7 +201,6 @@ def MIL_VT_small_patch16_384(pretrained=False, **kwargs):
     model = MILVisionTransformer(
         img_size=384, patch_size=16, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4, qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
-    model.default_cfg = _cfg()
     if pretrained:
         checkpoint = torch.hub.load_state_dict_from_url(
             url="",
@@ -216,7 +215,6 @@ def MIL_VT_small_patch16_512(pretrained=False, **kwargs):
     model = MILVisionTransformer(
         img_size=512, patch_size=16, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4, qkv_bias=True,
         norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
-    model.default_cfg = _cfg()
     if pretrained:
         checkpoint = torch.hub.load_state_dict_from_url(
             url="",

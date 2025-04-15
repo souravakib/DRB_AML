@@ -33,7 +33,7 @@ def main():
 
     gpu_ids = [0]
     start_epoch = 0
-    max_epoch = 30
+    max_epoch = 10
     save_fraq = 10
 
     batch_size = 16
@@ -42,7 +42,7 @@ def main():
     n_classes = 5
 
     balanceFlag = True  #balanceFlag is set to True to balance the sampling of different classes
-    debugFlag = False  #Debug flag is set to True to train on a small dataset
+    debugFlag = True  #Debug flag is set to True to train on a small dataset
 
     base_model = 'MIL_VT_small_patch16_'+str(img_size)  #nominate the MIL-VT model to be used
     MODEL_PATH_finetune = 'MIL_VT_weights/fundus_pretrained_VT_small_patch16_384_5Class.pth.tar'

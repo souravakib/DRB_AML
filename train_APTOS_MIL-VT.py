@@ -25,8 +25,8 @@ from models.MIL_VT import *
 def main():
 
     """Basic Setting"""
-    data_path = '/content/datasets/sovitrath/diabetic-retinopathy-2015-data-colored-resized/versions/2/colored_images/colored_images/'
-    csv_path = '/content/datasets/sovitrath/diabetic-retinopathy-2015-data-colored-resized/versions/2/'
+    data_path = '/content/dr_dataset_flattened/'
+    csv_path = '/content/dr_dataset_flattened/'
     save_model_path = r'data/APTOS/PytorchModel/'
     csvName = csv_path + 'trainLabels.csv'  
 

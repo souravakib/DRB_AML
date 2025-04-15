@@ -17,7 +17,7 @@ class dataset_Aptos(data.Dataset):
     def __getitem__(self, index):
 
         try:
-            imgName = os.path.join(self.data_path, self.DF.loc[index, 'id_code'])
+            imgName = os.path.join(self.data_path, self.DF.loc[index, 'image'])
             imgName = imgName + '.png'
             imgName = imgName.replace('\\', '/')
 
@@ -35,7 +35,7 @@ class dataset_Aptos(data.Dataset):
             
         except:
             index = 0
-            imgName = os.path.join(self.data_path, self.DF.loc[index, 'id_code'])
+            imgName = os.path.join(self.data_path, self.DF.loc[index, 'image'])
             imgName = imgName + '.png'
             imgName = imgName.replace('\\', '/')
 

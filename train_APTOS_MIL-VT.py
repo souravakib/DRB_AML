@@ -104,7 +104,8 @@ def main():
 
     #################################################
     """Load the CSV as DF and split train / valid set"""
-    DF0= pd.read_csv(csvName, encoding='UTF')
+    DF0 = pd.read_csv(csvName, encoding='UTF')
+    DF0 = DF0.rename(columns={'level': 'diagnosis'}) 
 
     if debugFlag == True:
         indexes = np.arange(len(DF0))

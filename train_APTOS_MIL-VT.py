@@ -26,11 +26,11 @@ from torchvision.transforms import InterpolationMode
 def main():
 
     """Basic Setting"""
-    data_path = "/content/colored_images/colored_images/"
-
-    csv_path = "/content/"
-    save_model_path = r'data/APTOS/PytorchModel/'
-    csvName = csv_path + "trainLabels_filtered.csv"
+    data_path = "/content/all_images_flat"  # ✅ Flattened image directory
+    csv_path = "/content/"                  # ✅ Path where CSV is saved
+    save_model_path = 'data/APTOS/PytorchModel/'  # Output model directory
+    csvName = csv_path + "trainLabels_filtered.csv"  # ✅ Filtered CSV (after matching with images)
+    
 
     gpu_ids = [0]
     start_epoch = 0

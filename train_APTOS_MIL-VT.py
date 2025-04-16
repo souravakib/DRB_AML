@@ -26,11 +26,11 @@ from torchvision.transforms import InterpolationMode
 def main():
 
     """Basic Setting"""
-    data_path = '/kaggle/input/diabetic-retinopathy-2015-data-colored-resized/colored_images/colored_images/'
+    data_path = "/content/colored_images/colored_images/"
 
-    csv_path = '/kaggle/working/'
+    csv_path = "/content/"
     save_model_path = r'data/APTOS/PytorchModel/'
-    csvName = csv_path + 'trainLabels_renamed.csv'  
+    csvName = csv_path + "trainLabels.csv" 
 
     gpu_ids = [0]
     start_epoch = 0

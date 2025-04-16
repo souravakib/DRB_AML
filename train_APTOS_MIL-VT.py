@@ -30,7 +30,7 @@ def main():
 
     csv_path = "/content/"
     save_model_path = r'data/APTOS/PytorchModel/'
-    csvName = csv_path + "trainLabels.csv" 
+    csvName = csv_path + "trainLabels_filtered.csv"
 
     gpu_ids = [0]
     start_epoch = 0

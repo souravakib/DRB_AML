@@ -15,8 +15,9 @@ class dataset_Aptos(data.Dataset):
 
     def __getitem__(self, index):
         image_id = self.DF.loc[index, 'image']
-        label = self.DF.loc[index, 'level']
+        label = self.DF.loc[index, 'diagnosis']
         label_onehot = np.eye(5)[label]
+
     
         if not image_id.endswith('.png'):
             image_id += '.png'

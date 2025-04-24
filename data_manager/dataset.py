@@ -8,48 +8,31 @@ import random
 
 
 class dataset_Aptos(data.Dataset):
-    def __init__(self, data_path, DF, transform = None):
-
+    def __init__(self, data_path, DF, transform=None):
         self.data_path = data_path
         self.transform = transform
         self.DF = DF
 
     def __getitem__(self, index):
+        image_id = self.DF.loc[index, 'image']
+        label = self.DF.loc[index, 'diagnosis']
+        label_onehot = np.eye(5)[label]
 
-        try:
-            imgName = os.path.join(self.data_path, self.DF.loc[index, 'image'])
-            imgName = imgName + '.png'
-            imgName = imgName.replace('\\', '/')
+        # Ensure .png extension
+        if not image_id.endswith('.png'):
+            image_id += '.png'
 
-            Img = cv2.imread(imgName)
-            Img = cv2.cvtColor(Img, cv2.COLOR_BGR2RGB)
-            Img = transforms.ToPILImage()(Img)
+        img_path = os.path.join(self.data_path, image_id).replace('\\', '/')
 
-            if self.transform is not None:
-                Img = self.transform(Img)
+        Img = cv2.imread(img_path)
+        if Img is None:
+            raise FileNotFoundError(f"❌ Image not found or unreadable: {img_path}")
 
-            # Get the Labels
-            label = self.DF.loc[index, 'diagnosis']
-            label_onehot = np.zeros(5)
-            label_onehot[label] = 1
-            
-        except:
-            index = 0
-            imgName = os.path.join(self.data_path, self.DF.loc[index, 'image'])
-            imgName = imgName + '.png'
-            imgName = imgName.replace('\\', '/')
+        Img = cv2.cvtColor(Img, cv2.COLOR_BGR2RGB)
+        Img = transforms.ToPILImage()(Img)
 
-            Img = cv2.imread(imgName)
-            Img = cv2.cvtColor(Img, cv2.COLOR_BGR2RGB)
-            Img = transforms.ToPILImage()(Img)
-
-            if self.transform is not None:
-                Img = self.transform(Img)
-
-            # Get the Labels
-            label = self.DF.loc[index, 'diagnosis']
-            label_onehot = np.zeros(5)
-            label_onehot[label] = 1
+        if self.transform is not None:
+            Img = self.transform(Img)
 
         return Img, label, label_onehot
 
@@ -57,48 +40,30 @@ class dataset_Aptos(data.Dataset):
         return len(self.DF)
 
 
-
 class dataset_RFMiD(data.Dataset):
-    def __init__(self, data_path, DF, transform = None):
-
+    def __init__(self, data_path, DF, transform=None):
         self.data_path = data_path
         self.transform = transform
         self.DF = DF
 
-
     def __getitem__(self, index):
+        image_id = self.DF.loc[index, 'image']
+        label = self.DF.loc[index, 'Disease_Risk']
 
-        try:
-            imgName = os.path.join(self.data_path, self.DF.loc[index, 'image'])
-            imgName = imgName + '.png'
-            imgName = imgName.replace('\\', '/')
+        if not image_id.endswith('.png'):
+            image_id += '.png'
 
-            Img = cv2.imread(imgName)
-            Img = cv2.cvtColor(Img, cv2.COLOR_BGR2RGB)
-            Img = transforms.ToPILImage()(Img)
+        img_path = os.path.join(self.data_path, image_id).replace('\\', '/')
+        Img = cv2.imread(img_path)
 
-            if self.transform is not None:
-                Img = self.transform(Img)
-            label = self.DF.loc[index, 'Disease_Risk']
+        if Img is None:
+            raise FileNotFoundError(f"❌ Image not found or unreadable: {img_path}")
 
-            
-        except:
-            index = 0
-            imgName = os.path.join(self.data_path, self.DF.loc[index, 'image'])
-            imgName = imgName + '.png'
-            imgName = imgName.replace('\\', '/')
+        Img = cv2.cvtColor(Img, cv2.COLOR_BGR2RGB)
+        Img = transforms.ToPILImage()(Img)
 
-            Img = cv2.imread(imgName)
-            Img = cv2.cvtColor(Img, cv2.COLOR_BGR2RGB)
-            Img = transforms.ToPILImage()(Img)
-
-            if self.transform is not None:
-                Img = self.transform(Img)
-
-            # Get the Labels
-            label = self.DF.loc[index, 'Disease_Risk']
-            # label_onehot = np.zeros(2)
-            # label_onehot[label] = 1
+        if self.transform is not None:
+            Img = self.transform(Img)
 
         return Img, label
 

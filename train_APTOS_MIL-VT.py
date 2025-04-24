@@ -29,7 +29,7 @@ def main():
     data_path = "/content/diabetic_retinopathy_dataset/colored_images"  # ✅ Flattened image directory
     csv_path = "/content/"                  # ✅ Path where CSV is saved
     save_model_path = 'data/APTOS/PytorchModel/'  # Output model directory
-    csvName = csv_path + "trainLabels_filtered.csv"  # ✅ Filtered CSV (after matching with images)
+    csvName = "/content/diabetic_retinopathy_dataset/trainLabels.csv"
     
 
     gpu_ids = [0]

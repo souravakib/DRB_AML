@@ -26,7 +26,7 @@ from torchvision.transforms import InterpolationMode
 def main():
 
     """Basic Setting"""
-    data_path = "/content/all_images_flat"  # ✅ Flattened image directory
+    data_path = "/content/diabetic_retinopathy_dataset/colored_images"  # ✅ Flattened image directory
     csv_path = "/content/"                  # ✅ Path where CSV is saved
     save_model_path = 'data/APTOS/PytorchModel/'  # Output model directory
     csvName = csv_path + "trainLabels_filtered.csv"  # ✅ Filtered CSV (after matching with images)

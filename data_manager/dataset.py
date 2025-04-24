@@ -35,7 +35,6 @@ class dataset_Aptos(data.Dataset):
         except:
             index = 0
             imgName = os.path.join(self.data_path, self.DF.loc[index, 'image'])
-            imgName = imgName + '.png'
             imgName = imgName.replace('\\', '/')
 
             Img = cv2.imread(imgName)
@@ -68,8 +67,7 @@ class dataset_RFMiD(data.Dataset):
     def __getitem__(self, index):
 
         try:
-            imgName = os.path.join(self.data_path, str(self.DF.loc[index, 'ID']))
-            imgName = imgName + '.png'
+            imgName = os.path.join(self.data_path, self.DF.loc[index, 'image'])
             imgName = imgName.replace('\\', '/')
 
             Img = cv2.imread(imgName)
@@ -83,8 +81,7 @@ class dataset_RFMiD(data.Dataset):
             
         except:
             index = 0
-            imgName = os.path.join(self.data_path, str(self.DF.loc[index, 'ID']))
-            imgName = imgName + '.png'
+            imgName = os.path.join(self.data_path, self.DF.loc[index, 'image'])
             imgName = imgName.replace('\\', '/')
 
             Img = cv2.imread(imgName)

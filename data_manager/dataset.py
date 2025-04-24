@@ -18,6 +18,7 @@ class dataset_Aptos(data.Dataset):
 
         try:
             imgName = os.path.join(self.data_path, self.DF.loc[index, 'image'])
+            imgName = imgName + '.png'
             imgName = imgName.replace('\\', '/')
 
             Img = cv2.imread(imgName)
@@ -35,6 +36,7 @@ class dataset_Aptos(data.Dataset):
         except:
             index = 0
             imgName = os.path.join(self.data_path, self.DF.loc[index, 'image'])
+            imgName = imgName + '.png'
             imgName = imgName.replace('\\', '/')
 
             Img = cv2.imread(imgName)
@@ -68,6 +70,7 @@ class dataset_RFMiD(data.Dataset):
 
         try:
             imgName = os.path.join(self.data_path, self.DF.loc[index, 'image'])
+            imgName = imgName + '.png'
             imgName = imgName.replace('\\', '/')
 
             Img = cv2.imread(imgName)
@@ -82,6 +85,7 @@ class dataset_RFMiD(data.Dataset):
         except:
             index = 0
             imgName = os.path.join(self.data_path, self.DF.loc[index, 'image'])
+            imgName = imgName + '.png'
             imgName = imgName.replace('\\', '/')
 
             Img = cv2.imread(imgName)

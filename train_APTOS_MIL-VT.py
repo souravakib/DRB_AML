@@ -11,13 +11,13 @@ from torch import nn
 from torch.autograd import Variable
 from torch.nn import DataParallel
 from torch.utils.data import DataLoader
-import os
 
 import utils
 from data_manager.dataset import dataset_Aptos
 from loss.MultiClassMetrics import *
 from models.FinetuneVTmodels import MIL_VT_FineTune
 from utils import *
+
 from models.MIL_VT import *
 from torchvision.transforms import InterpolationMode
 
@@ -28,8 +28,9 @@ def main():
     """Basic Setting"""
     data_path = "/content/diabetic_retinopathy_dataset/colored_images"  # ✅ Flattened image directory
     csv_path = "/content/"                  # ✅ Path where CSV is saved
-    save_model_path = '/content/drive/MyDrive/MIL_VT/PytorchModel/'  # Save models to Google Drive
+    save_model_path = 'data/APTOS/PytorchModel/'  # Output model directory
     csvName = "/content/diabetic_retinopathy_dataset/trainLabels.csv"
+    
 
     gpu_ids = [0]
     start_epoch = 0
@@ -49,13 +50,9 @@ def main():
 
     dateTag = datetime.today().strftime('%Y%m%d')
     prefix = base_model + '_' + dateTag
-    model_save_dir = os.path.join(save_model_path, prefix)  # Save models in Google Drive
+    model_save_dir = os.path.join(save_model_path,  prefix)
     tbFileName = os.path.join(model_save_dir, 'runs/' + prefix)
     savemodelPrefix = prefix + '_ep'
-
-    # Create directories for logs and checkpoints if they don't exist
-    os.makedirs(os.path.join(save_model_path, 'logs'), exist_ok=True)
-    os.makedirs(os.path.join(save_model_path, 'checkpoints'), exist_ok=True)
 
     ##resume training with an interrupted model
     resumeFlag = False
@@ -261,5 +258,204 @@ def main():
     else:
         print('Skipping test with best_model (not saved in debug mode)')
 
+
     tbWriter.close()
     print("Finished. Total elapsed time (h:m:s): {}. Training time (h:m:s): {}.".format(elapsed, train_time))
+
+
+
+def train(epoch, model, criterion, optimizer, train_loader, max_epoch,  tbWriter):
+    start_time = time.time()
+    model.train()
+    losses = utils.AverageMeter()
+    losses1 = utils.AverageMeter()
+    losses2 = utils.AverageMeter()
+
+    ground_truths_multiclass = []
+    ground_truths_multilabel = []
+
+    predictions_class = []
+    total = 0
+    for batch_idx, (inputs, labels_multiclass, labels_onehot) in enumerate(train_loader):
+        inputs = inputs.cuda()
+        targets_class = labels_multiclass.cuda()
+        # # print(targets_class)
+
+        outputs_class, outputs_MIL = model(inputs)
+        loss1 = criterion(outputs_class, targets_class)
+        loss2 = criterion(outputs_MIL, targets_class)
+        loss = 0.5*loss1 + 0.5*loss2
+
+        optimizer.zero_grad()
+        loss.backward()
+        nn.utils.clip_grad_value_(model.parameters(), 0.1)
+        optimizer.step()
+
+        losses.update(loss.data.cpu().numpy())
+        losses1.update(loss1.data.cpu().numpy())
+        losses2.update(loss2.data.cpu().numpy())
+
+        ###Update learning rate
+        steps = len(train_loader)*epoch + batch_idx
+        if steps>0 and steps % 2000 == 0:
+            print('steps: ', steps)
+            adjust_learning_rate(optimizer, 0.5)
+
+        total += targets_class.size(0)
+        _, predicted_class = torch.max(outputs_class.data, 1)
+
+        #"""Save the losses to tensorboard"""
+        tbWriter.add_scalar('AllLoss/train', loss, steps)
+
+        outputs_class = utils.softmax(outputs_class.data.cpu().numpy())
+        ground_truths_multiclass.extend(labels_multiclass.data.cpu().numpy())
+        ground_truths_multilabel.extend(labels_onehot.data.cpu().numpy())
+        predictions_class.extend(outputs_class)
+
+    """Mesure the prediction performance on train set"""
+    gts = np.asarray(ground_truths_multiclass)
+    probs = np.asarray(predictions_class)
+    preds = np.argmax(probs, axis=1)
+    accuracy = metrics.accuracy_score(gts, preds)
+
+    gts2 = np.asarray(ground_truths_multilabel)
+    trues = np.asarray(gts2).flatten()
+    probs2 = np.asarray(probs).flatten()
+    AUC = metrics.roc_auc_score(trues, probs2)
+
+    wKappa = metrics.cohen_kappa_score(gts, preds, weights='quadratic')
+    wF1 = metrics.f1_score(gts, preds, average='weighted')
+
+    """Save the performance to tensorboard"""
+    tbWriter.add_scalar('accuraccy/train', accuracy, epoch)
+    tbWriter.add_scalar('AUC/train', AUC, epoch)
+    tbWriter.add_scalar('wF1/train', wF1, epoch)
+    tbWriter.add_scalar('wKapa/train', wKappa, epoch)
+    tbWriter.add_scalar('Loss/train', losses.avg, epoch)
+
+
+    end_time = time.time()
+    print('\t Epoch {}/{}'.format(epoch, max_epoch))
+    print('\t Train:    Acc %0.3f,  AUC %0.3f, weightedKappa %0.3f, weightedF1 %0.3f, loss1 %.6f, loss2 %.6f, time %3.2f'
+        % (accuracy, AUC, wKappa, wF1, losses1.avg, losses2.avg, end_time - start_time))
+    return  0
+
+
+def val(epoch, model, criterion, val_loader, max_epoch, tbWriter):
+    start_time = time.time()
+    model.eval()
+    losses = utils.AverageMeter()
+
+
+    ground_truths_multiclass = []
+    ground_truths_multilabel = []
+    predictions_class = []
+    scores = []
+    total = 0
+
+    for batch_idx, (inputs,  labels_multiclass, labels_onehot) in enumerate(val_loader):
+        inputs = Variable(inputs.cuda())
+        targets_class = Variable(labels_multiclass.cuda())
+
+        outputs_class = model(inputs)
+        loss = criterion(outputs_class, targets_class) #targets_class
+
+        losses.update(loss.data.cpu().numpy())
+
+        outputs_class = utils.softmax(outputs_class.data.cpu().numpy())
+        ground_truths_multiclass.extend(labels_multiclass.data.cpu().numpy())
+        ground_truths_multilabel.extend(labels_onehot.data.cpu().numpy())
+        predictions_class.extend(outputs_class)
+
+        total += targets_class.size(0)
+
+    """Mesure the prediction performance on valid set"""
+    gts = np.asarray(ground_truths_multiclass)
+    probs = np.asarray(predictions_class)
+    preds = np.argmax(probs, axis=1)
+    accuracy = metrics.accuracy_score(gts, preds)
+
+    gts2 = np.asarray(ground_truths_multilabel)
+    trues = np.asarray(gts2).flatten()
+    probs2 = np.asarray(probs).flatten()
+    AUC = metrics.roc_auc_score(trues, probs2)
+
+    wKappa = metrics.cohen_kappa_score(gts, preds, weights='quadratic')
+    wF1 = metrics.f1_score(gts, preds, average='weighted')
+
+    """Save the performance to tensorboard"""
+    tbWriter.add_scalar('accuraccy/valid', accuracy, epoch)
+    tbWriter.add_scalar('AUC/valid', AUC, epoch)
+    tbWriter.add_scalar('wF1/valid', wF1, epoch)
+    tbWriter.add_scalar('wKapa/valid', wKappa, epoch)
+    tbWriter.add_scalar('Loss/valid', losses.avg, epoch)
+
+
+    end_time = time.time()
+    print('-------- Epoch {}/{}'.format(epoch, max_epoch))
+    print('-------- Val:  Acc %0.3f,  AUC %0.3f, weightedKappa %0.3f, weightedF1 %0.3f, loss %.6f, time %3.2f'
+        % (accuracy, AUC, wKappa, wF1, losses.avg,  end_time - start_time))
+    print('=============================================================')
+    return AUC, wF1
+
+
+
+def test(epoch, model, criterion, test_loader,  tbWriter):
+    start_time = time.time()
+    model.eval()
+    losses = utils.AverageMeter()
+
+
+    ground_truths_multiclass = []
+    ground_truths_multilabel = []
+    predictions_class = []
+    total = 0
+
+    for batch_idx, (inputs, labels_multiclass, labels_onehot) in enumerate(test_loader):
+        inputs = Variable(inputs.cuda())
+        targets_class = Variable(labels_multiclass.cuda())
+
+        outputs_class = model(inputs)
+        loss = criterion(outputs_class, targets_class) #targets_class
+
+        losses.update(loss.data.cpu().numpy())
+
+        outputs_class = utils.softmax(outputs_class.data.cpu().numpy())
+        ground_truths_multiclass.extend(labels_multiclass.data.cpu().numpy())
+        ground_truths_multilabel.extend(labels_onehot.data.cpu().numpy())
+        predictions_class.extend(outputs_class)
+        total += targets_class.size(0)
+
+
+    """Mesure the prediction performance on test set"""
+    gts = np.asarray(ground_truths_multiclass)
+    probs = np.asarray(predictions_class)
+    preds = np.argmax(probs, axis=1)
+    accuracy = metrics.accuracy_score(gts, preds)
+
+    gts2 = np.asarray(ground_truths_multilabel)
+    trues = np.asarray(gts2).flatten()
+    probs2 = np.asarray(probs).flatten()
+    AUC = metrics.roc_auc_score(trues, probs2)
+
+    wKappa = metrics.cohen_kappa_score(gts, preds, weights='quadratic')
+    wF1 = metrics.f1_score(gts, preds, average='weighted')
+
+    """Save the performance to tensorboard"""
+    tbWriter.add_scalar('accuraccy/test', accuracy, epoch)
+    tbWriter.add_scalar('AUC/test', AUC, epoch)
+    tbWriter.add_scalar('wF1/test', wF1, epoch)
+    tbWriter.add_scalar('wKapa/test', wKappa, epoch)
+    tbWriter.add_scalar('Loss/test', losses.avg, epoch)
+
+    end_time = time.time()
+    print( 'TestSet:  Acc %0.3f,  AUC %0.3f, weightedKappa %0.3f, weightedF1 %0.3f, time %3.2f'
+        % (accuracy, AUC, wKappa, wF1,  end_time - start_time))
+    print('=============================================================')
+    return AUC, wF1
+
+
+
+if __name__ == '__main__':
+    main()
+

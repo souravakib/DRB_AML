@@ -28,7 +28,7 @@ def main():
     """Basic Setting"""
     data_path = "/content/diabetic_retinopathy_dataset/colored_images"  # ✅ Flattened image directory
     csv_path = "/content/"                  # ✅ Path where CSV is saved
-    save_model_path = '/content/trained_weights/'  # Output model directory
+    save_model_path = "/content/drive/MyDrive/training_logs/checkpoints"  # Output model directory
     csvName = "/content/diabetic_retinopathy_dataset/trainLabels.csv"
     
 

@@ -165,14 +165,14 @@ def main():
         transforms.ColorJitter(hue=0.05, saturation=0.05, brightness=0.05),
         RandAugment(num_ops=2, magnitude=7),
         transforms.ToTensor(),
-        transforms.Normalize([0.5] * 3, [0.5] * 3),
+        transforms.Normalize([0.320358008146286, 0.22458165884017944, 0.1611877828836441], [0.30284109711647034, 0.2192249298095703, 0.17492994666099548]),
     ])
     
     
     transform_test = transforms.Compose([
         transforms.Resize((img_size, img_size)),
         transforms.ToTensor(),
-        transforms.Normalize([0.5] * 3, [0.5] * 3),
+        transforms.Normalize([0.320358008146286, 0.22458165884017944, 0.1611877828836441], [0.30284109711647034, 0.2192249298095703, 0.17492994666099548]),
     ])
 
 

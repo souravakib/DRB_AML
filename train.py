@@ -34,7 +34,7 @@ def main():
 
     gpu_ids = [0]
     start_epoch = 0
-    max_epoch = 70
+    max_epoch = 1
     save_fraq = 10
 
     batch_size = 16

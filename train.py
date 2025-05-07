@@ -38,7 +38,7 @@ def main():
     save_fraq = 10
 
     batch_size = 16
-    img_size = 384
+    img_size = 224
     initialLR = 2e-5
     n_classes = 5
 

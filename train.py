@@ -13,7 +13,7 @@ from torch.nn import DataParallel
 from torch.utils.data import DataLoader
 
 import utils
-from data_manager.dataset import dataset_Aptos
+from data_manager.dataset import dataset_DR
 from loss.MultiClassMetrics import *
 from models.FinetuneVTmodels import MIL_VT_FineTune
 from utils import *
@@ -177,9 +177,9 @@ def main():
 
 
 
-    dataset_train = dataset_Aptos(data_path, DF_train, transform = transform_train)
-    dataset_valid = dataset_Aptos(data_path, DF_val, transform = transform_test)
-    dataset_test = dataset_Aptos(data_path, DF_test, transform=transform_test)
+    dataset_train = dataset_DR(data_path, DF_train, transform = transform_train)
+    dataset_valid = dataset_DR(data_path, DF_val, transform = transform_test)
+    dataset_test = dataset_DR(data_path, DF_test, transform=transform_test)
 
     """assign sample weight to deal with the unblanced classes"""
     weights = make_weights_for_balanced_classes(DF_train, n_classes)                                                           

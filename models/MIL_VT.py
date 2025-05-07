@@ -194,7 +194,22 @@ class MILVisionTransformer_Distil(VisionTransformer):
 
 
 ###############################
-
+@register_model
+def MIL_VT_small_patch16_224(pretrained=False, **kwargs):
+    kwargs.pop('pretrained_cfg', None)
+    kwargs.pop('pretrained_cfg_overlay', None)
+    kwargs.pop('cache_dir', None)
+    
+    model = MILVisionTransformer(
+        img_size=224, patch_size=16, embed_dim=384, depth=12, num_heads=6, mlp_ratio=4, qkv_bias=True,
+        norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
+    if pretrained:
+        checkpoint = torch.hub.load_state_dict_from_url(
+            url="",
+            map_location="cpu", check_hash=True
+        )
+        model.load_state_dict(checkpoint["model"])
+    return model
 
 @register_model
 def MIL_VT_small_patch16_384(pretrained=False, **kwargs):

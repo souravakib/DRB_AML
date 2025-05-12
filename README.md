@@ -1,6 +1,11 @@
 # MIL-VT
 
-Code for MICCAI 2021 accepted paper: MIL-VT: Multiple Instance Learning Enhanced Vision Transformer for Fundus Image Classification
+Credit: S. Yu et al., "MIL-VT: Multiple Instance Learning Enhanced Vision Transformer for Fundus Image Classification," in Proc. MICCAI, 2021.
+Code base borrowed from: https://github.com/greentreeys/MIL-VT
+
+Enhancement and changes made by AML GRP 15
+
+Please run the provided notebook on Google Colab.
 
 ### Basic Requirement:
 * timm==0.3.2
@@ -18,20 +23,3 @@ Code for MICCAI 2021 accepted paper: MIL-VT: Multiple Instance Learning Enhanced
 * Please download pretrained weight of fundus image from this link:
 * https://drive.google.com/drive/folders/1YgdhA7BK6Unrs2lOflOd9rPTrwm17gdf?usp=sharing
 * Store the pretrain weight in 'weights/fundus_pretrained_VT_small_patch16_384_5Class.pth.tar'
-
-
-### Dataset
-* APTOS data from kaggle: https://www.kaggle.com/ratthachat/aptos-eye-preprocessing-in-diabetic-retinopathy
-* RFMiD data from IEEE data port: https://ieee-dataport.org/open-access/retinal-fundus-multi-disease-image-dataset-rfmid
-
-### BibTex:
-```
-@inproceedings{yu2021mil,
-  title={Mil-vt: Multiple instance learning enhanced vision transformer for fundus image classification},
-  author={Yu, Shuang and Ma, Kai and Bi, Qi and Bian, Cheng and Ning, Munan and He, Nanjun and Li, Yuexiang and Liu, Hanruo and Zheng, Yefeng},
-  booktitle={International Conference on Medical Image Computing and Computer-Assisted Intervention},
-  pages={45--54},
-  year={2021},
-  organization={Springer}
-}
-```
